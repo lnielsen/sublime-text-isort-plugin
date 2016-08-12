@@ -1,4 +1,5 @@
 import os
+import os.path
 import sys
 
 import sublime
@@ -49,10 +50,14 @@ class IsortCommand(sublime_plugin.TextCommand):
 
         this_contents = self.get_buffer_contents(this_view)
         settings = self.get_settings()
+        old_cwd = os.getcwd()
+        os.chdir(os.path.dirname(this_view.file_name()))
         sorted_imports = SortImports(
             file_contents=this_contents,
             **settings
-        ).output
+        )
+        os.chdir(old_cwd)
+        sorted_imports = sorted_imports.output
         this_view.replace(edit, self.get_region(this_view), sorted_imports)
 
         # Our sel has moved now..
